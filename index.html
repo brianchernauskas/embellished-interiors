@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Embellished Interiors</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#faf7f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1a18" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Embellished">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1>Embellished <em>Interiors</em></h1>
+    <p id="hdrSub" class="sub"></p>
+  </div>
+</header>
+
+<main>
+  <!-- ADD -->
+  <section id="view-add">
+    <div class="card">
+      <label for="q">Say it or type it</label>
+      <div class="row">
+        <input id="q" type="text" autocomplete="off" autocapitalize="sentences" placeholder="15 minutes Park Villas, call with Cristina">
+        <button id="mic" class="icon" aria-label="Dictate" hidden>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+        </button>
+        <button id="fill" class="ghost">Fill</button>
+      </div>
+      <p class="hint">Tip: tap the keyboard’s mic to dictate. “Mileage 35 miles Goodyear” works too.</p>
+    </div>
+
+    <div class="seg" role="tablist">
+      <button id="segTime" class="on">Time</button>
+      <button id="segMiles">Mileage</button>
+    </div>
+
+    <div class="card">
+      <h2>Site</h2>
+      <div id="sites" class="sites"></div>
+
+      <div id="timeCtl">
+        <h2>Time</h2>
+        <div class="readout"><span id="rdBig">0 h</span><span id="rdSub">tap to add time</span></div>
+        <div class="chips">
+          <button data-add="15">+15</button>
+          <button data-add="30">+30</button>
+          <button data-add="60">+1 hr</button>
+          <button data-add="-15" class="ghost">−15</button>
+          <button data-add="reset" class="ghost">Clear</button>
+        </div>
+      </div>
+
+      <div id="milesCtl" hidden>
+        <h2>Miles</h2>
+        <input id="miles" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0">
+        <div id="recentMiles" class="chips"></div>
+      </div>
+
+      <h2 id="noteLbl">What for <span class="opt">optional</span></h2>
+      <input id="note" type="text" autocapitalize="sentences" placeholder="e.g. Call with Cristina re: movie room">
+
+      <h2>Date</h2>
+      <input id="date" type="date">
+
+      <button id="save" class="primary" disabled>Save</button>
+    </div>
+  </section>
+
+  <!-- LOG -->
+  <section id="view-log" hidden>
+    <div class="stats" id="stats"></div>
+    <div id="logFilter" class="chips scroll"></div>
+    <div id="logList"></div>
+  </section>
+
+  <!-- EXPORT -->
+  <section id="view-export" hidden>
+    <div class="card">
+      <h2>For the Google Sheet</h2>
+      <label for="exSite">Site</label>
+      <select id="exSite"></select>
+      <label for="exScope">Which entries</label>
+      <select id="exScope">
+        <option value="new">Not yet exported</option>
+        <option value="all">Everything</option>
+      </select>
+      <div id="exSummary" class="summary"></div>
+      <div class="row2">
+        <button id="copyHours" class="primary">Copy hours</button>
+        <button id="copyMiles" class="primary">Copy mileage</button>
+      </div>
+      <p class="hint">Copies rows as <b>Amount · Date · Task</b> (hours) or <b>Amount · Location · Date</b> (mileage), ready to paste into the sheet.</p>
+      <button id="markDone" class="ghost wide">Mark these as exported</button>
+      <button id="dlCsv" class="ghost wide">Download CSV</button>
+    </div>
+
+    <div class="card">
+      <h2>Settings &amp; backup</h2>
+      <label for="rate">Mileage rate ($ per mile)</label>
+      <input id="rate" type="number" inputmode="decimal" step="0.001" min="0">
+      <div class="row2">
+        <button id="bkp" class="ghost">Download backup</button>
+        <button id="rst" class="ghost">Restore backup</button>
+      </div>
+      <input id="rstFile" type="file" accept="application/json" hidden>
+      <p class="hint">Entries live on this phone only. Download a backup now and then.</p>
+    </div>
+  </section>
+</main>
+
+<nav>
+  <button data-tab="add" class="on"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Add</button>
+  <button data-tab="log"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 6h14M5 12h14M5 18h9"/></svg>Log</button>
+  <button data-tab="export"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M8 8l4-4 4 4M5 14v5h14v-5"/></svg>Export</button>
+</nav>
+
+<dialog id="edit">
+  <form method="dialog" id="editForm">
+    <h2>Edit entry</h2>
+    <label for="eSite">Site</label><select id="eSite"></select>
+    <label for="eAmt" id="eAmtLbl">Minutes</label><input id="eAmt" type="number" inputmode="decimal" step="any" min="0">
+    <label for="eNote">What for</label><input id="eNote" type="text">
+    <label for="eDate">Date</label><input id="eDate" type="date">
+    <div class="row2">
+      <button type="button" id="eDel" class="danger">Delete</button>
+      <button type="submit" class="primary" value="save">Save</button>
+    </div>
+    <button type="button" id="eCancel" class="ghost wide">Cancel</button>
+  </form>
+</dialog>
+
+<div id="toast" role="status"></div>
+
+<script src="parser.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
