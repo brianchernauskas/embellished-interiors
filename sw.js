@@ -1,4 +1,4 @@
-const CACHE = 'ei-v2';
+const CACHE = 'ei-v3';
 const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'parser.js', 'siri.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
