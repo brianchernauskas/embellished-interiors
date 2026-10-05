@@ -109,19 +109,17 @@
       <h2>Siri</h2>
       <p id="siriStatus" class="hint" style="margin-top:0"></p>
       <div class="row2">
-        <button id="siriCopy" class="ghost">Copy link</button>
+        <button id="siriCopy" class="ghost">Copy Shortcut link</button>
         <button id="siriTest" class="ghost">Send test</button>
       </div>
       <details>
         <summary>Set up “Hey Siri, add hours”</summary>
         <ol class="steps">
-          <li>Tap <b>Copy link</b> above.</li>
-          <li>Open the <b>Shortcuts</b> app, tap <b>+</b>, and name it <b>Add Hours</b>. That name is what she says to Siri. Avoid “Log Time” or “Time”: Siri treats those as “what time is it?”.</li>
-          <li>Add <b>Dictate Text</b> (Stop Listening: After Pause).</li>
-          <li>Add <b>Get Contents of URL</b>. Paste the link as the URL, tap <b>Show More</b>, set Method to <b>POST</b> and Request Body to <b>JSON</b>.</li>
-          <li>Under the JSON, tap <b>Add new field</b> → <b>Dictionary</b>, key <b>fields</b>. Inside it add a <b>Dictionary</b> with key <b>text</b>. Inside that add a <b>Text</b> with key <b>stringValue</b> and set its value to the <b>Dictated Text</b> variable.</li>
-          <li>Optional: add <b>Speak Text</b> “Added”.</li>
-          <li>Say “Hey Siri, add hours”, then speak: “fifteen minutes Park Villas, call from Cristina.” Open this app and tap Save.</li>
+          <li>Tap <b>Copy Shortcut link</b> above.</li>
+          <li>Open the <b>Shortcuts</b> app, make a new shortcut, and name it <b>Add Hours</b>. That name is what she says to Siri. Avoid “Log Time”: Siri treats it as “what time is it?”.</li>
+          <li>Add the action <b>Ask for Input</b>. Input type <b>Text</b>, question “What’s the entry?”.</li>
+          <li>Add the action <b>Open URLs</b> (or <b>Open URL</b>). In its link field, <b>paste</b> the copied link, then tap right after the <b>=</b> at the end and insert the <b>Provided Input</b> variable from step 3.</li>
+          <li>Say “Hey Siri, add hours”, wait for the question, then answer: “fifteen minutes Park Villas, call from Cristina.” A page opens saying it was added. Then open this app and tap Save.</li>
         </ol>
       </details>
       <details>

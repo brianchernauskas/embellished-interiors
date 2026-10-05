@@ -167,7 +167,7 @@
     renderInbox(); renderSiriStatus();
   }
   function renderSiriStatus() { $('#siriStatus').textContent = siriState || 'Checking…'; $('#siriKey').value = window.EISiri.getKey() || ''; }
-  $('#siriCopy').onclick = () => copy(window.EISiri.endpoint(), 'Link copied — paste it into the Shortcut');
+  $('#siriCopy').onclick = () => copy(window.EISiri.sendLink(), 'Link copied — paste it into the Shortcut');
   $('#siriTest').onclick = async () => {
     const r = await window.EISiri.send('15 minutes Park Villas test from Siri setup');
     if (r.ok) { toast('Test sent'); refreshInbox(); } else toast(`Test failed (${r.error})`);

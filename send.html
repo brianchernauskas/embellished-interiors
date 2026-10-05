@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Embellished Interiors</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { display: grid; place-items: center; padding: 24px; text-align: center; }
+  .box { max-width: 420px; }
+  .tick { font: 400 56px/1 var(--serif); color: var(--accent); }
+  q { display: block; margin: 16px 0; font: italic 19px var(--serif); color: var(--muted); quotes: "“" "”"; }
+  h1 { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Embellished <em>Interiors</em></h1>
+  <div id="icon" class="tick">…</div>
+  <p id="msg">Sending to your inbox…</p>
+  <q id="said" hidden></q>
+  <p class="hint" id="hint"></p>
+</div>
+<script src="siri.js"></script>
+<script>
+(async () => {
+  const p = new URLSearchParams(location.search);
+  const key = (p.get('k') || '').toLowerCase(), text = (p.get('say') || '').trim();
+  const $ = s => document.querySelector(s);
+  history.replaceState(null, '', location.pathname); // a reload must not send it twice
+  if (!text) { $('#icon').textContent = '–'; $('#msg').textContent = 'Nothing to send.'; $('#hint').textContent = 'Say the entry after “Add Hours”.'; return; }
+  if (!/^[a-f0-9]{32}$/.test(key)) { $('#icon').textContent = '!'; $('#msg').textContent = 'This link is missing its key.'; $('#hint').textContent = 'Copy a fresh Shortcut link from the app (Export → Siri).'; return; }
+  $('#said').textContent = text; $('#said').hidden = false;
+  const r = await EISiri.send(text, key);
+  if (r.ok) { $('#icon').textContent = '✓'; $('#msg').textContent = 'Added to your inbox.'; $('#hint').textContent = 'Open the Embellished app to confirm and save it.'; }
+  else { $('#icon').textContent = '!'; $('#msg').textContent = 'Couldn’t send that.'; $('#hint').textContent = r.error === 'offline' ? 'No connection — try again.' : `Something’s off with the link (${r.error}). Copy a fresh one from the app.`; }
+})();
+</script>
+</body>
+</html>

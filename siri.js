@@ -24,8 +24,9 @@
     if (!VALID.test(k)) return false;
     try { localStorage.setItem(LS, k); return true; } catch (e) { return false; }
   }
-  const base = () => `${ROOT}/embellished/${getKey()}/inbox`;
+  const base = (k = getKey()) => `${ROOT}/embellished/${k}/inbox`;
   const endpoint = () => `${base()}?key=${API_KEY}`;
+  const sendLink = () => `${location.origin}${location.pathname.replace(/[^/]*$/, '')}send.html?k=${getKey()}&say=`;
 
   // -> { items: [{id, text, at}] } | { error }
   async function list() {
@@ -47,9 +48,10 @@
     try { const r = await fetch(`${base()}/${encodeURIComponent(id)}?key=${API_KEY}`, { method: 'DELETE' }); return r.ok; }
     catch (e) { return false; }
   }
-  async function send(text) {
+  async function send(text, key) {
+    if (key && !VALID.test(key)) return { error: 'badkey' };
     try {
-      const r = await fetch(endpoint(), {
+      const r = await fetch(`${base(key || getKey())}?key=${API_KEY}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fields: { text: { stringValue: String(text).slice(0, 500) } } }),
       });
@@ -57,5 +59,5 @@
     } catch (e) { return { error: 'offline' }; }
   }
 
-  root.EISiri = { getKey, setKey, endpoint, list, remove, send };
+  root.EISiri = { getKey, setKey, endpoint, sendLink, list, remove, send };
 })(window);
