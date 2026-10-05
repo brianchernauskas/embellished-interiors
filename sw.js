@@ -1,5 +1,5 @@
-const CACHE = 'ei-v1';
-const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'parser.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/apple-touch-icon.png'];
+const CACHE = 'ei-v2';
+const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'parser.js', 'siri.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

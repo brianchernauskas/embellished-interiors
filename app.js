@@ -108,18 +108,74 @@
   $('#note').oninput = e => { draft.note = e.target.value; };
   $('#date').onchange = e => { draft.date = e.target.value || today(); };
 
-  $('#save').onclick = () => {
+  function addEntry(d) {
     const e = {
-      id: uid(), created: Date.now(), type: draft.type, site: draft.site, date: draft.date,
-      minutes: draft.type === 'time' ? draft.minutes : 0,
-      miles: draft.type === 'mileage' ? num(draft.miles) : 0,
-      note: draft.note.trim(), exported: false,
+      id: uid(), created: Date.now(), type: d.type, site: d.site, date: d.date,
+      minutes: d.type === 'time' ? d.minutes : 0,
+      miles: d.type === 'mileage' ? num(d.miles) : 0,
+      note: (d.note || '').trim(), exported: false,
     };
     db.entries.push(e); persist();
     toast(e.type === 'time' ? `Saved ${fmtDur(e.minutes)} · ${siteName(e.site)}` : `Saved ${e.miles} mi · ${siteName(e.site)}`);
+    renderHeader();
+    return e;
+  }
+
+  $('#save').onclick = () => {
+    addEntry(draft);
+    if (draft.fromInbox) dropInbox(draft.fromInbox);
     draft = freshDraft(draft.type); $('#q').value = '';
-    renderAdd(); renderHeader();
+    renderAdd();
   };
+
+  // ---------- Siri inbox ----------
+  let inbox = [];
+  const draftFromParsed = p => ({
+    type: p.type, site: p.siteId, minutes: p.minutes, miles: p.miles || '', note: p.note,
+    date: addDays(today(), p.dateOffset || 0),
+  });
+  const complete = d => d.site && (d.type === 'time' ? d.minutes > 0 : +d.miles > 0);
+  const summarise = d => `${d.type === 'time' ? fmtDur(d.minutes || 0) : num(d.miles || 0) + ' mi'} · ${d.site ? siteName(d.site) : 'which site?'}${d.note ? ' · ' + d.note : ''}`;
+
+  function renderInbox() {
+    if (!inbox.length) { $('#inbox').innerHTML = ''; return; }
+    $('#inbox').innerHTML = `<div class="inbox"><h2>From Siri · ${inbox.length}</h2>` + inbox.map(it => {
+      const p = parse(it.text), d = draftFromParsed(p), ok = complete(d);
+      return `<div class="ib" data-id="${esc(it.id)}"><q>${esc(it.text)}</q><b>${esc(summarise(d))}</b><div class="row2">` +
+        (ok ? `<button class="primary" data-act="save">Save</button>` : `<button class="primary" data-act="review">Review</button>`) +
+        `<button class="ghost" data-act="${ok ? 'review' : 'review'}">${ok ? 'Edit' : ''}</button><button class="ghost" data-act="drop" aria-label="Dismiss">✕</button></div></div>`;
+    }).join('') + '</div>';
+    $('#inbox').querySelectorAll('.ib .row2 button').forEach(b => { if (!b.textContent.trim()) b.remove(); });
+  }
+  async function dropInbox(id) {
+    inbox = inbox.filter(i => i.id !== id); renderInbox();
+    await window.EISiri.remove(id);
+  }
+  $('#inbox').onclick = e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const id = b.closest('.ib').dataset.id, it = inbox.find(i => i.id === id); if (!it) return;
+    const p = parse(it.text), d = draftFromParsed(p);
+    if (b.dataset.act === 'drop') dropInbox(id);
+    else if (b.dataset.act === 'save') { addEntry(d); dropInbox(id); }
+    else { draft = { ...freshDraft(d.type), ...d, fromInbox: id }; $('#q').value = it.text; renderAdd(); window.scrollTo(0, 0); if (p.siteAmbiguous) toast('Which Chandler — Phase 1 or Phase 2?'); }
+  };
+  let siriState = '';
+  async function refreshInbox() {
+    const r = await window.EISiri.list();
+    if (r.items) { inbox = r.items; siriState = `Connected · ${inbox.length} waiting`; }
+    else siriState = r.error === 'offline' ? 'Offline — will check next time you open the app' : `Can’t reach the inbox (${r.error})`;
+    renderInbox(); renderSiriStatus();
+  }
+  function renderSiriStatus() { $('#siriStatus').textContent = siriState || 'Checking…'; $('#siriKey').value = window.EISiri.getKey() || ''; }
+  $('#siriCopy').onclick = () => copy(window.EISiri.endpoint(), 'Link copied — paste it into the Shortcut');
+  $('#siriTest').onclick = async () => {
+    const r = await window.EISiri.send('15 minutes Park Villas test from Siri setup');
+    if (r.ok) { toast('Test sent'); refreshInbox(); } else toast(`Test failed (${r.error})`);
+  };
+  $('#siriKeySet').onclick = () => {
+    if (window.EISiri.setKey($('#siriKey').value)) { toast('Key updated'); refreshInbox(); } else toast('That isn’t a valid key');
+  };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshInbox(); });
 
   // voice (works in Safari; in a home-screen app the keyboard mic is the fallback)
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -262,7 +318,7 @@
   // settings
   $('#rate').value = db.settings.rate;
   $('#rate').onchange = e => { const v = +e.target.value; if (v >= 0) { db.settings.rate = v; persist(); renderExport(); } };
-  $('#bkp').onclick = () => saveFile(`embellished-backup-${today()}.json`, JSON.stringify(db, null, 1), 'application/json');
+  $('#bkp').onclick = () => saveFile(`embellished-backup-${today()}.json`, JSON.stringify({ ...db, siriKey: window.EISiri.getKey() }, null, 1), 'application/json');
   $('#rst').onclick = () => $('#rstFile').click();
   $('#rstFile').onchange = async e => {
     const f = e.target.files[0]; if (!f) return;
@@ -270,7 +326,7 @@
       const d = JSON.parse(await f.text());
       if (!Array.isArray(d.entries)) throw 0;
       if (!confirm(`Replace everything on this phone with ${d.entries.length} entries from the backup?`)) return;
-      db = { entries: d.entries, settings: { ...DEFAULTS().settings, ...d.settings } }; persist();
+      db = { entries: d.entries, settings: { ...DEFAULTS().settings, ...d.settings } }; persist(); if (d.siriKey) window.EISiri.setKey(d.siriKey);
       $('#rate').value = db.settings.rate; renderAll(); toast('Backup restored');
     } catch (err) { toast('That file isn’t a valid backup'); }
     e.target.value = '';
@@ -287,7 +343,7 @@
   document.querySelector('nav').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) show(b.dataset.tab); };
 
   function renderAll() { renderHeader(); renderAdd(); renderLog(); fillExportSites(); renderExport(); }
-  renderAll();
+  renderAll(); refreshInbox();
 
   // opened with ?q=… (e.g. from an iOS Shortcut) → pre-fill the form
   const q = new URLSearchParams(location.search).get('q');

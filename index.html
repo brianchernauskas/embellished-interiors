@@ -27,6 +27,7 @@
 <main>
   <!-- ADD -->
   <section id="view-add">
+    <div id="inbox"></div>
     <div class="card">
       <label for="q">Say it or type it</label>
       <div class="row">
@@ -104,6 +105,33 @@
       <button id="dlCsv" class="ghost wide">Download CSV</button>
     </div>
 
+    <div class="card" id="siriCard">
+      <h2>Siri</h2>
+      <p id="siriStatus" class="hint" style="margin-top:0"></p>
+      <div class="row2">
+        <button id="siriCopy" class="ghost">Copy link</button>
+        <button id="siriTest" class="ghost">Send test</button>
+      </div>
+      <details>
+        <summary>Set up “Hey Siri, log time”</summary>
+        <ol class="steps">
+          <li>Tap <b>Copy link</b> above.</li>
+          <li>Open the <b>Shortcuts</b> app, tap <b>+</b>, and name it <b>Log Time</b>. That name is what she says to Siri.</li>
+          <li>Add <b>Dictate Text</b> (Stop Listening: After Pause).</li>
+          <li>Add <b>Get Contents of URL</b>. Paste the link as the URL, tap <b>Show More</b>, set Method to <b>POST</b> and Request Body to <b>JSON</b>.</li>
+          <li>Under the JSON, tap <b>Add new field</b> → <b>Dictionary</b>, key <b>fields</b>. Inside it add a <b>Dictionary</b> with key <b>text</b>. Inside that add a <b>Text</b> with key <b>stringValue</b> and set its value to the <b>Dictated Text</b> variable.</li>
+          <li>Optional: add <b>Speak Text</b> “Added”.</li>
+          <li>Say “Hey Siri, log time”, then speak: “fifteen minutes Park Villas, call from Cristina.” Open this app and tap Save.</li>
+        </ol>
+      </details>
+      <details>
+        <summary>Use a different key</summary>
+        <label for="siriKey">Key</label>
+        <input id="siriKey" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <button id="siriKeySet" class="ghost wide">Use this key</button>
+      </details>
+    </div>
+
     <div class="card">
       <h2>Settings &amp; backup</h2>
       <label for="rate">Mileage rate ($ per mile)</label>
@@ -142,6 +170,7 @@
 <div id="toast" role="status"></div>
 
 <script src="parser.js"></script>
+<script src="siri.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -1,0 +1,14 @@
+    // --- Embellished Interiors: Siri inbox ---------------------------------
+    // Paste inside `match /databases/{database}/documents { ... }` next to the
+    // existing blocks. Holds short dictated sentences waiting for confirmation.
+    // The key is a random 128-bit value known only to her phone and her Shortcut;
+    // the parent collection can't be listed, so keys can't be enumerated.
+    match /embellished/{key}/inbox/{id} {
+      allow create: if key.matches('[a-f0-9]{32}')
+        && request.resource.data.keys().hasOnly(['text'])
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 500;
+      allow get, list, delete: if key.matches('[a-f0-9]{32}');
+      allow update: if false;
+    }

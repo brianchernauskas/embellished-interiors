@@ -10,6 +10,7 @@ const cases = [
   ['add 15 to Goodyear', { minutes: 15, siteId: 'goodyear' }],
   ['15 minutes Chandler call with Dan', { minutes: 15, siteId: null, siteAmbiguous: true, note: 'Call with Dan' }],
   ['mileage 35 miles to Goodyear', { type: 'mileage', miles: 35, siteId: 'goodyear' }],
+  ['drive 35 miles to Goodyear', { type: 'mileage', miles: 35, siteId: 'goodyear', note: '' }],
   ['drove 145 miles Houghton', { type: 'mileage', miles: 145, siteId: 'houghton' }],
   ['add fifteen minutes to Park Villas yesterday for email', { minutes: 15, siteId: 'park', dateOffset: -1, note: 'Email' }],
   ['one hour and 15 minutes Houghton', { minutes: 75, siteId: 'houghton' }],

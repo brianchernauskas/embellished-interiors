@@ -114,3 +114,16 @@ dialog::backdrop { background: rgba(0,0,0,.4); }
   opacity: 0; pointer-events: none; transition: .25s; max-width: 90vw; text-align: center;
 }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.inbox { background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 18px; padding: 14px; margin: 12px 0; }
+.inbox h2 { margin: 0 0 10px; color: var(--accent); }
+.ib { background: var(--card); border-radius: 12px; padding: 12px; margin-top: 8px; }
+.ib q { display: block; font: italic 15px var(--serif); color: var(--muted); quotes: "“" "”"; }
+.ib b { display: block; margin: 6px 0 10px; font: 400 17px var(--serif); }
+.ib .row2 { margin-top: 0; grid-template-columns: 2fr 1fr 44px; }
+.ib button { min-height: 42px; padding: 8px; }
+details { margin-top: 14px; }
+summary { cursor: pointer; color: var(--accent); font-size: 15px; }
+.steps { padding-left: 20px; margin: 10px 0 0; font-size: 14px; color: var(--muted); }
+.steps li { margin-bottom: 8px; }
+.steps b { color: var(--ink); font-weight: 600; }
